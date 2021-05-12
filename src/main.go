@@ -12,7 +12,7 @@ func main() {
 	fmt.Println("Hello World!")
 
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(":8080", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.42.0.58:8080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %s", err)
 	}
@@ -32,11 +32,11 @@ func main() {
 	request := gen.PutArtifactTypeRequest{}
 	request.ArtifactType = &datasetType
 
-	response, err := c.PutArtifactType(context.Background(), &request)
+	putArtifResp, err := c.PutArtifactType(context.Background(), &request)
 	if err != nil {
 		log.Fatalf("Error when calling PutArtifactType: %s", err)
 	}
-	log.Printf("Request Success(?) Response from server, TypeId: %s", response.GetTypeId())
+	log.Printf("Request Success(?) Response from server, TypeId: %s", putArtifResp.GetTypeId())
 
 	//Put model artifact
 	modelType := gen.ArtifactType{}
@@ -50,11 +50,27 @@ func main() {
 	request = gen.PutArtifactTypeRequest{}
 	request.ArtifactType = &modelType
 
-	response, err = c.PutArtifactType(context.Background(), &request)
+	putArtifResp, err = c.PutArtifactType(context.Background(), &request)
 	if err != nil {
 		log.Fatalf("Error when calling PutArtifactType: %s", err)
 	}
-	log.Printf("Request Success(?) Response from server, TypeId: %s", response.GetTypeId())
+	log.Printf("Request Success(?) Response from server, TypeId: %s", putArtifResp.GetTypeId())
+
+	getArtifResponse, err := c.GetArtifactTypes(context.Background(), &gen.GetArtifactTypesRequest{})
+	if err != nil {
+		log.Fatalf("Error when calling GetArtifactType: %s", err)
+	}
+	artifacts := getArtifResponse.ArtifactTypes
+	log.Println("Get Response, num of artifactTypes: ", len(artifacts))
+
+	for _, artifact := range artifacts {
+		log.Println("ArtifactName: ", artifact.Name)
+	}
+
+		
+		
+		
+		
 /*	Python code to be translated to golang
 	from grpc import insecure_channel
 	from ml_metadata.proto import metadata_store_pb2
